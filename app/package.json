@@ -30,7 +30,7 @@
     "@tanstack/react-router-ssr-query": "^1.167.0",
     "@tanstack/react-start": "1.169.7",
     "convex": "1.46.0",
-    "effect": "4.0.0-rc.117",
+    "effect": "4.1.5",
     "jimp": "^1.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
