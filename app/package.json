@@ -1,0 +1,58 @@
+{
+  "name": "innovator-island",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "concurrently -n convex,vite -c cyan,blue 'npx convex dev' 'vite dev --port 3002'",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "echo \"No deploy script on purpose. See README: Deploy your own copy\" && exit 1",
+    "cf-typegen": "wrangler types",
+    "convex:codegen": "convex codegen",
+    "convex:dev": "convex dev",
+    "test": "vitest run",
+    "typecheck": "wrangler types && tsc --noEmit",
+    "lint": "biome lint .",
+    "assets": "node --experimental-strip-types scripts/make-assets.ts"
+  },
+  "dependencies": {
+    "@convex-dev/aggregate": "^0.3.4",
+    "@convex-dev/rate-limiter": "^0.4.3",
+    "@convex-dev/react-query": "^0.1.0",
+    "@convex-dev/workflow": "^0.5.0",
+    "@fontsource-variable/fredoka": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-router": "1.170.46",
+    "@tanstack/react-router-ssr-query": "^1.167.0",
+    "@tanstack/react-start": "1.169.7",
+    "convex": "1.46.0",
+    "effect": "4.0.0-rc.117",
+    "jimp": "^1.7.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "@cloudflare/vite-plugin": "^1.0.0",
+    "@cloudflare/workers-types": "^4.20250409.0",
+    "@edge-runtime/vm": "^5.0.0",
+    "@tanstack/router-plugin": "^1.132.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^10.0.7",
+    "convex-test": "^0.0.70",
+    "jsdom": "^31.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^3.0.5",
+    "wrangler": "^4.74.0"
+  }
+}

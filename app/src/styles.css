@@ -1,0 +1,280 @@
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/fredoka/wght.css';
+
+/* All type is roman: no italic, oblique or cursive. Palette comes from the original map: sea teal, path orange, sand cream, leaf green. */
+:root {
+  --sand: #fbf3dc;
+  --sand-deep: #f1e2b8;
+  --ink: #1d2b2f;
+  --ink-soft: #46585d;
+  --sea: #0b6577;
+  --sea-deep: #084a5a;
+  --path: #f28c28;
+  --path-deep: #b45309;
+  --leaf: #1f7a3d;
+  --coral: #c2410c;
+  --sun: #ffd34d;
+  --line: #e0cfa0;
+  --focus: #1d2b2f;
+  --radius: 18px;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --display: 'Fredoka Variable', 'Inter Variable', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+img, svg { max-width: 100%; }
+body {
+  margin: 0;
+  background: var(--sand);
+  background-image: radial-gradient(circle at 1px 1px, rgb(242 140 40 / 0.14) 1.5px, transparent 0);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+h1, h2 { font-family: var(--display); font-weight: 600; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); }
+h2 { font-size: 1.5rem; margin-bottom: 0.75rem; color: var(--sea-deep); }
+a { color: var(--sea-deep); }
+code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  background: var(--ink);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  z-index: 10;
+}
+.skip-link:focus-visible { top: 0.5rem; }
+
+/* Header: a park entrance sign. Sea gradient, orange path stripe, wavy sand edge. */
+.site-header {
+  position: relative;
+  background: linear-gradient(120deg, var(--sea-deep) 0%, var(--sea) 55%, #0d7a73 100%);
+  color: #fff;
+  padding: 1rem var(--gutter) 3.5rem;
+  overflow-x: clip;
+  border-bottom: 8px dashed var(--path);
+}
+.site-header::before {
+  content: '';
+  position: absolute;
+  right: clamp(1rem, 8vw, 6rem);
+  top: 5.25rem;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--sun) 0 55%, rgb(255 211 77 / 0.35) 56% 100%);
+  pointer-events: none;
+}
+@media (max-width: 48rem) { .site-header::before { display: none; } }
+.site-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5rem;
+  background: var(--sand);
+  -webkit-mask: radial-gradient(1.1rem at 50% 0, #0000 98%, #000) 0 0 / 2.2rem 100% repeat-x;
+  mask: radial-gradient(1.1rem at 50% 0, #0000 98%, #000) 0 0 / 2.2rem 100% repeat-x;
+  pointer-events: none;
+}
+.site-header__inner { max-width: 72rem; margin: 0 auto; position: relative; }
+.site-header p { margin: 0.5rem 0 0; max-width: 60ch; }
+.site-header__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-bottom: 1rem; padding: 0 0.5rem 0.4rem 0; }
+/* Our own wordmark: a wooden entrance sign with two nails. */
+.site-header__logo { position: relative; display: block; max-width: 100%; padding: 0.35rem 1.4rem; background: var(--sand); color: var(--sea-deep); border: 4px solid var(--path); border-radius: 14px; box-shadow: 0 0 0 3px #8a5a2b, 0 5px 0 3px #5e3d1b; font-family: var(--display); font-weight: 700; font-size: 1.4rem; line-height: 1.1; text-decoration: none; text-align: center; text-wrap: balance; }
+.site-header__logo::before, .site-header__logo::after { content: ''; position: absolute; top: 50%; width: 0.4rem; height: 0.4rem; margin-top: -0.2rem; border-radius: 50%; background: #8a5a2b; }
+.site-header__logo::before { left: 0.5rem; }
+.site-header__logo::after { right: 0.5rem; }
+.site-header nav { flex: 1 1 auto; min-width: 0; }
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.16);
+  border: 2px solid rgb(255 255 255 / 0.7);
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+.nav a[aria-current='page'] { background: var(--sun); border-color: var(--sun); color: var(--ink); font-weight: 600; }
+.site-header :where(a, select):focus-visible { outline-color: #fff; box-shadow: 0 0 0 5px var(--ink); }
+.lang { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.lang select { min-height: 2.75rem; border-radius: 999px; border: 2px solid #fff; padding: 0 0.9rem; background: #fff; color: var(--ink); font: inherit; }
+
+main { padding: 1.5rem 0 2.5rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; width: min(100% - 2 * var(--gutter), 72rem); margin: 0 auto; }
+main:focus { outline: none; }
+.site-footer { padding: 1.5rem var(--gutter); color: var(--ink-soft); font-size: 0.875rem; border-top: 3px dotted var(--path); background: var(--sand-deep); }
+.site-footer p { max-width: 72rem; margin: 0 auto; }
+.empty { padding: 1rem; border: 2px dashed var(--path-deep); border-radius: var(--radius); background: #fff; }
+
+/* Outage board: a chalkboard announcement sign with a wooden frame. */
+.outages { padding: 0 var(--gutter); }
+.board { max-width: 72rem; margin: 1rem auto 0; background: #1f3a3d; color: #fdf6e3; border: 6px solid #8a5a2b; border-radius: var(--radius); padding: 0.75rem 1rem 1rem; box-shadow: 0 4px 0 #5e3d1b; }
+.board__title { margin: 0 0 0.5rem; font-family: var(--display); font-size: 1.25rem; font-weight: 600; color: var(--sun); }
+.board__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.board__item { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.board__sign { background: var(--coral); color: #fff; border-radius: 999px; padding: 0.1rem 0.75rem; font-family: var(--display); font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
+
+/* Park layout: map beside the list on wide screens, map then list on phones. */
+.park { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: start; }
+@media (min-width: 62rem) {
+  .park { grid-template-columns: minmax(0, 38rem) minmax(0, 1fr); }
+  .park__list { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; padding: 0.25rem; }
+}
+
+/* Map: the original image fills the width and keeps its aspect ratio. Sizes scale with the map via container units. */
+.map { position: relative; container-type: inline-size; aspect-ratio: 1400 / 1720; width: 100%; border: 5px solid var(--sea); border-radius: var(--radius); overflow: hidden; background: var(--sand-deep); box-shadow: 0 6px 0 var(--sea-deep); }
+.map__art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.map__rides, .map__facilities { list-style: none; margin: 0; padding: 0; }
+.map__ride, .facility { position: absolute; transform: translate(-50%, -42%); }
+.map__ride { z-index: 2; }
+.map__ride:hover, .map__ride:focus-within { z-index: 5; }
+.marker { position: relative; display: grid; justify-items: center; text-decoration: none; color: var(--ink); border-radius: 16px; }
+.marker__bubble {
+  width: clamp(2.25rem, 8cqw, 3.5rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 3px solid var(--sea);
+  border-radius: 28%;
+  box-shadow: 0 3px 0 rgb(0 0 0 / 0.22);
+  padding: 8%;
+}
+.marker__bubble img { display: block; width: 100%; height: auto; }
+.marker .pill { margin-top: -0.5rem; position: relative; padding: 0 0.5rem; font-size: 0.75rem; line-height: 1.35; }
+/* The name tag floats above the marker so it never takes space, and only shows on hover or keyboard focus. */
+.marker__name {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 10rem;
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid var(--sea);
+  border-radius: 14px;
+  padding: 0.1rem 0.6rem;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  text-align: center;
+  box-shadow: 0 3px 0 rgb(0 0 0 / 0.2);
+  pointer-events: none;
+}
+.marker:hover .marker__name, .marker:focus-visible .marker__name { display: block; }
+/* Small maps (phones): a smaller bubble ringed in the wait colour. The wait itself is in the list and the link name. */
+@container (max-width: 30rem) {
+  .marker__bubble { width: 2.125rem; }
+  .marker .pill { display: none; }
+  .marker--short .marker__bubble { border-color: #0f6b4a; }
+  .marker--moderate .marker__bubble { border-color: #d9a400; }
+  .marker--long .marker__bubble { border-color: var(--coral); }
+}
+.marker:hover .marker__bubble { border-color: var(--path-deep); }
+.marker--closed .marker__bubble { filter: grayscale(0.85); border-color: #4b5563; }
+.marker:focus-visible { outline-offset: 4px; }
+
+/* Wait pills. Text colours pass AA on their backgrounds. */
+.pill { display: inline-flex; align-items: center; gap: 0.3rem; border-radius: 999px; padding: 0.1rem 0.7rem; font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; border: 2px solid #fff; box-shadow: 0 2px 0 rgb(0 0 0 / 0.2); }
+.pill--short { background: #0f6b4a; color: #fff; }
+.pill--moderate { background: var(--sun); color: #3b2a00; }
+.pill--long { background: var(--coral); color: #fff; }
+.pill--closed { background: #4b5563; color: #fff; }
+.pill__sign { flex: none; }
+
+/* Facilities: glyph-only pins under the rides. Their names are in the accessible label. */
+.facility { z-index: 1; pointer-events: none; }
+.facility__glyph { display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem; padding: 0 0.2rem; border-radius: 999px 999px 999px 4px; background: var(--leaf); color: #fff; border: 2px solid #fff; font-family: var(--display); font-weight: 600; font-size: 0.75rem; line-height: 1; }
+.facility--atm .facility__glyph { background: #6d28d9; }
+.facility--dining .facility__glyph { background: var(--coral); }
+
+/* Ride list */
+.hint { color: var(--ink-soft); margin: 0 0 0.75rem; font-size: 0.875rem; }
+.rides { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.ride { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.9rem 0.5rem 0.5rem; background: #fff; border: 3px solid var(--sea); border-radius: var(--radius); scroll-margin-top: 1rem; }
+.ride:target { border-color: var(--path-deep); box-shadow: 0 0 0 4px var(--sun); }
+.ride__icon { flex: none; width: 3rem; height: auto; }
+.ride__name { flex: 1; font-family: var(--display); font-weight: 600; font-size: 1.05rem; color: var(--ink); text-underline-offset: 0.2em; }
+.ride:hover .ride__name { color: var(--sea-deep); }
+
+/* Ride card */
+.back-link { font-family: var(--display); font-weight: 500; }
+.ride-card { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; width: 100%; max-width: 40rem; justify-self: center; background: #fff; border: 5px solid var(--sea); border-radius: 28px; padding: 1.5rem; box-shadow: 0 6px 0 var(--sea-deep); }
+.ride-card__icon { width: min(10rem, 40vw); height: auto; background: var(--sand); border: 3px solid var(--path); border-radius: 28%; padding: 0.75rem; }
+.ride-card__body { flex: 1 1 14rem; display: grid; gap: 1rem; justify-items: start; }
+.ride-card__facts { display: grid; gap: 0.75rem; margin: 0; }
+.ride-card__facts dt { color: var(--ink-soft); font-size: 0.875rem; }
+.ride-card__facts dd { margin: 0.15rem 0 0; font-family: var(--display); font-weight: 600; font-size: 1.25rem; }
+.ride-card__facts .pill { font-size: 1.25rem; padding: 0.2rem 1rem; }
+.button, button[type='submit'] { display: inline-flex; align-items: center; justify-self: start; min-height: 2.75rem; padding: 0 1.4rem; border: 3px solid #fff; border-radius: 999px; background: var(--path-deep); color: #fff; font-family: var(--display); font-weight: 600; font-size: 1.05rem; text-decoration: none; cursor: pointer; box-shadow: 0 4px 0 #7c3a06; }
+button[type='submit']:disabled { opacity: 0.6; cursor: progress; }
+
+/* Photos */
+.form { display: grid; gap: 1rem; max-width: 36rem; background: #fff; border: 4px dashed var(--path); border-radius: var(--radius); padding: 1.25rem; }
+.field { display: grid; gap: 0.35rem; }
+.field label { font-family: var(--display); font-weight: 600; font-size: 1.1rem; }
+.field input[type='file'] { padding: 0.75rem; background: var(--sand); border: 2px solid var(--ink-soft); border-radius: 14px; font: inherit; }
+.field input[aria-invalid='true'] { border-color: #a4210f; border-width: 3px; }
+.field .hint { margin: 0; }
+.error { margin: 0; padding: 0.75rem 1rem; background: #fde8e4; color: #7a1410; border: 2px solid #a4210f; border-radius: 14px; }
+.status { margin: 0; min-height: 1.5rem; }
+.gallery { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+.gallery__item { position: relative; background: #fff; border: 3px solid var(--sea); border-radius: 14px; padding: 0.6rem 0.6rem 0; }
+.gallery__item img { display: block; width: 100%; height: auto; border-radius: 8px; background: var(--sand); }
+.gallery__item > .hint, .gallery__item > .error { margin: 0.5rem 0; }
+.ticket__stub { margin: 0.75rem -0.6rem 0; padding: 0.5rem 0.75rem; border-top: 3px dashed var(--path); background: var(--sand); border-radius: 0 0 10px 10px; font-family: var(--display); font-weight: 500; color: var(--ink-soft); font-size: 0.875rem; }
+.gallery__item:has(.ticket__stub)::before, .gallery__item:has(.ticket__stub)::after { content: ''; position: absolute; bottom: 2.3rem; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--sand); border: 3px solid var(--sea); }
+.gallery__item:has(.ticket__stub)::before { left: -0.75rem; clip-path: inset(0 0 0 50%); }
+.gallery__item:has(.ticket__stub)::after { right: -0.75rem; clip-path: inset(0 50% 0 0); }
+
+/* Stats: scoreboard tiles */
+.stats { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); margin: 0; }
+.stat { background: var(--sea-deep); color: #fff; border: 4px solid var(--sun); border-radius: var(--radius); padding: 1rem; box-shadow: 0 5px 0 rgb(0 0 0 / 0.25); }
+.stat:nth-child(even) { border-color: var(--path); }
+.stat dt { color: #d7f0f2; font-size: 0.875rem; font-weight: 600; }
+.stat dd { margin: 0.25rem 0 0; font-family: var(--display); font-size: 2.5rem; line-height: 1.1; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--sun); }
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; background: #fff; border: 3px solid var(--sea); border-radius: var(--radius); padding: 1rem; }
+.bars__row { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr 3rem; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
+.bars__track { height: 1rem; background: var(--sand-deep); border-radius: 999px; overflow: hidden; }
+.bars__fill { display: block; height: 100%; background: var(--path); border-radius: 999px; }
+.bars__value { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--display); font-weight: 600; }
+@media (max-width: 40rem) { .bars__row { grid-template-columns: 1fr 3rem; } .bars__label { grid-column: 1 / -1; } .bars__track { grid-column: 1; } }
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Motion only when the visitor has not asked for less. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .bars__fill { transition: width 0.4s ease; }
+  .marker__bubble { animation: bob 3.6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.45s); }
+  .marker .pill { animation: pop 0.45s ease-out; }
+  .pill { animation: pop 0.45s ease-out; }
+  .nav a, .button, button[type='submit'] { transition: transform 0.15s ease; }
+  .nav a:hover, .button:hover, button[type='submit']:hover:not(:disabled) { transform: translateY(-2px); }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes pop { 0% { transform: scale(0.7); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+}
