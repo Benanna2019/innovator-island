@@ -3,7 +3,6 @@ import { Effect } from 'effect'
 import { describe, expect, it } from 'vitest'
 import { ImagePipeline } from '#/domain/image/pipeline'
 import { ImageSniff, MAX_PIXELS } from '#/domain/image/sniff'
-import { GuestId } from '#/domain/guest-id'
 
 const fixture = () => new Uint8Array(readFileSync(new URL('./fixtures/greenscreen.png', import.meta.url)))
 const fail = <A, E>(effect: Effect.Effect<A, E>) => Effect.runPromise(Effect.flip(effect))
@@ -59,14 +58,5 @@ describe('ImagePipeline.chromaKey input checks', () => {
 
   it('rejects bytes that are not PNG or JPEG', async () => {
     expect(await fail(ImagePipeline.chromaKey(new TextEncoder().encode('<svg></svg>')))).toMatchObject({ _tag: 'NotAnImage' })
-  })
-})
-
-describe('GuestId', () => {
-  it('accepts a UUID and nothing guessable', () => {
-    expect(GuestId.isValid(crypto.randomUUID())).toBe(true)
-    expect(GuestId.isValid('aaaaaaaaaaaaaaaa')).toBe(false)
-    expect(GuestId.isValid('guest-0123456789abcdef')).toBe(false)
-    expect(GuestId.isValid('')).toBe(false)
   })
 })

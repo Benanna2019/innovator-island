@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as PhotosRouteImport } from './routes/photos'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 
@@ -19,9 +21,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PhotosRoute = PhotosRouteImport.update({
   id: '/photos',
   path: '/photos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StatsRoute = StatsRouteImport.update({
@@ -37,34 +49,49 @@ const RidesSlugRoute = RidesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/photos': typeof PhotosRoute
+  '/sign-in': typeof SignInRoute
   '/stats': typeof StatsRoute
   '/rides/$slug': typeof RidesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/photos': typeof PhotosRoute
+  '/sign-in': typeof SignInRoute
   '/stats': typeof StatsRoute
   '/rides/$slug': typeof RidesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/photos': typeof PhotosRoute
+  '/sign-in': typeof SignInRoute
   '/stats': typeof StatsRoute
   '/rides/$slug': typeof RidesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/photos' | '/stats' | '/rides/$slug'
+  fullPaths: '/' | '/admin' | '/photos' | '/sign-in' | '/stats' | '/rides/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/photos' | '/stats' | '/rides/$slug'
-  id: '__root__' | '/' | '/photos' | '/stats' | '/rides/$slug'
+  to: '/' | '/admin' | '/photos' | '/sign-in' | '/stats' | '/rides/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/photos'
+    | '/sign-in'
+    | '/stats'
+    | '/rides/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   PhotosRoute: typeof PhotosRoute
+  SignInRoute: typeof SignInRoute
   StatsRoute: typeof StatsRoute
   RidesSlugRoute: typeof RidesSlugRoute
 }
@@ -78,11 +105,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/photos': {
       id: '/photos'
       path: '/photos'
       fullPath: '/photos'
       preLoaderRoute: typeof PhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stats': {
@@ -104,7 +145,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   PhotosRoute: PhotosRoute,
+  SignInRoute: SignInRoute,
   StatsRoute: StatsRoute,
   RidesSlugRoute: RidesSlugRoute,
 }

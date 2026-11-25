@@ -15,7 +15,7 @@ async function tickPark(ctx: MutationCtx, parkId: Id<"parks">): Promise<number> 
   for (const ride of rides) {
     const state = stateByRide.get(ride._id)
     if (!state) continue
-    const next = RideController.step(ride, state, Math.random)
+    const next = RideController.step(ride, state, Math.random, state.queue ?? 0)
     // Every subscriber of rides.list re-renders on a patch, so write only when something changed.
     if (next.transition !== "none") {
       await ctx.db.patch(state._id, { wait: next.wait, targetWait: next.targetWait, closed: next.closed, updatedAt: now })

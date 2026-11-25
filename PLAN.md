@@ -25,7 +25,7 @@ Source: [aws-samples/aws-serverless-workshop-innovator-island](https://github.co
 | DynamoDB single table (`partitionKey`/`sortKey`) | Convex tables with indexes: `parks`, `rides`, `rideStates`, `visitors`, `parkEvents`, `photos`, `outages` | Typed schema in place of overloaded keys |
 | EventBridge schedule `rate(1 minute)` | `convex/crons.ts`, an interval that calls `internal.park.tick` | Built-in crons |
 | SNS topic fan-out | A single `parkEvents` table as the event log. The tick mutation inserts events, and subscribers run through `ctx.scheduler.runAfter(0, …)` or `@convex-dev/workpool` | Durable, transactional fan-out without a broker |
-| IoT Core MQTT, Cognito identity pool, browser websocket client | Convex reactive `useQuery` (`rides.list`, `photos.forGuest`, `outages.active`) | Realtime is built in, so there are no topics or credentials to manage |
+| IoT Core MQTT, Cognito identity pool, browser websocket client | Convex reactive `useQuery` (`rides.list`, `photos.mine`, `outages.active`) | Realtime is built in, so there are no topics or credentials to manage |
 | S3 presigned PUT (`getUploadURL`) | Convex file storage: `ctx.storage.generateUploadUrl()` behind a mutation, rate limited with `@convex-dev/rate-limiter` | Same "upload straight from the browser" pattern |
 | S3-triggered Lambda chain (chroma key, then composite, then post-process) | `@convex-dev/workflow`, started by the `photos.submit` mutation, with steps `chromaKey`, then `composite`, then `finalize` (Node actions using pure-JS image code such as `jimp`, which needs no OpenCV) | Explicit, retryable steps in place of implicit bucket triggers. The workflow is the comparison's main lesson |
 | OpenCV HSV `inRange` mask | A pure-TS HSV threshold over RGBA pixels, with the same default range `(36,50,50)` to `(70,255,255)` | No native binary on Convex |
@@ -40,7 +40,7 @@ Source: [aws-samples/aws-serverless-workshop-innovator-island](https://github.co
 
 ## Module list (smallest diff, in build order)
 
-1. Scaffold: `app/`, TanStack Start, Convex and a Worker (biome, vitest, wrangler). Add CI workflow `innovator-island.yml`, filtered to this path.
+1. Scaffold: `app/`, TanStack Start, Convex and a Worker (biome, vitest, wrangler). Add a CI workflow.
 2. Domain and seed: `convex/schema.ts` defines `parks`, `rides` (static config: name, min, max and rate values, closure probability, map coordinates), `rideStates`, `parkEvents`, `visitors`, `photos` and `outages`. Seed the 16 rides from `initRideState.json`, with our own names (no AWS service puns are needed, though keeping them is fine under MIT-0).
 3. Ride controller: `RideController.step(ride, rng)` is a pure, unit-tested function that ports `updateRideState`. A cron calls `park.tick`, which writes `rideStates` and emits events.
 4. Realtime map UI: a park map with ride markers, wait-time badges and a closed state, all updating live through `useQuery`. Use an accessible list view as well as the map.
@@ -55,7 +55,7 @@ UI rules apply: labels on every input, autocomplete and input types, focus-visib
 ## What we drop on purpose
 
 - Cloud9, CloudFormation, SAM, IAM policies and the setup and cleanup scripts. They are infrastructure ceremony, and Convex plus Wrangler replace them.
-- Cognito identity pools. They only existed so browsers could connect to IoT. Guests stay anonymous, identified by a random guest id in a cookie. Real auth is out of scope.
+- Cognito identity pools. They only existed so browsers could connect to IoT. Browsers stay anonymous until they upload a photo. A later demo build adds Convex Auth logins, roles and an operator console.
 - QuickSight and Athena dashboards. A small stats page replaces them.
 - The 30k-visitor scale and Firehose batching. The simulator is scaled down to stay well within Convex free and dev limits.
 - The Vue frontend. It was never in the repo, so we write a new React UI and copy nothing.
@@ -73,4 +73,4 @@ Phase 2 is an agent-run, RollerCoaster Tycoon-style simulation. Phase 1 keeps th
 
 ## Deploying
 
-Not deployed. To run your own copy, see the README. Use a Convex dev deployment while experimenting, and pass the Convex URL at build time.
+Not deployed from this repo. To run your own copy, see the README. Use a Convex dev deployment while experimenting, pass the Convex URL at build time, and keep `.env.local` out of `dist/server/.dev.vars`.

@@ -8,9 +8,9 @@ import { useI18n } from './I18nProvider'
  * The live gallery. `useQuery` re-runs when the workflow finishes, so there is nothing to poll. Upstream pushed a
  * "photo ready" message to the browser over IoT MQTT with a Cognito identity.
  */
-export function PhotoGallery({ guestId }: { guestId: string }) {
+export function PhotoGallery() {
   const { t, locale } = useI18n()
-  const photos = useQuery(api.photos.forGuest, { guestId })
+  const photos = useQuery(api.photos.mine, {})
   const ready = photos?.filter((p) => p.status === 'ready').length ?? 0
   const previousReady = useRef<number | null>(null)
   const [announcement, setAnnouncement] = useState('')

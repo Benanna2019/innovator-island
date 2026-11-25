@@ -44,15 +44,15 @@ export class EventBus {
 
   /**
    * Appends the event and schedules its subscribers. Safe to call from any mutation, and rolls back with it.
-   * Subscribers are only scheduled for types in DISPATCHED_TYPES. Pass `dispatch` to override that.
+   * Subscribers are only scheduled for types in DISPATCHED_TYPES. Pass `dispatch` to override that, and `at` to backdate an event when seeding history.
    */
   static async publish(
     ctx: MutationCtx,
     parkId: Id<"parks">,
     payload: ParkEventPayload,
-    options: { dispatch?: boolean } = {},
+    options: { dispatch?: boolean; at?: number } = {},
   ): Promise<Id<"parkEvents">> {
-    const eventId = await ctx.db.insert("parkEvents", { parkId, at: Date.now(), payload })
+    const eventId = await ctx.db.insert("parkEvents", { parkId, at: options.at ?? Date.now(), payload })
     if (isStatsEvent(payload.type)) {
       const doc = await ctx.db.get(eventId)
       if (doc) await parkStats.insert(ctx, doc)

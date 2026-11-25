@@ -16,6 +16,7 @@ export const Route = createFileRoute('/')({
     await Promise.all([
       context.queryClient.ensureQueryData(convexQuery(api.rides.list, { parkSlug: PARK_SLUG })),
       context.queryClient.ensureQueryData(convexQuery(api.outages.active, { parkSlug: PARK_SLUG })),
+      context.queryClient.ensureQueryData(convexQuery(api.guests.onMap, { parkSlug: PARK_SLUG })),
     ])
   },
   component: Home,
@@ -24,6 +25,7 @@ export const Route = createFileRoute('/')({
 function Home() {
   const { t } = useI18n()
   const { data } = useSuspenseQuery(convexQuery(api.rides.list, { parkSlug: PARK_SLUG }))
+  const { data: guests } = useSuspenseQuery(convexQuery(api.guests.onMap, { parkSlug: PARK_SLUG }))
   const [beforeCmd, afterCmd] = t('home.empty', { command: '\u0000' }).split('\u0000')
 
   return (
@@ -41,7 +43,12 @@ function Home() {
           <div className="park">
             <section aria-labelledby="map-heading" className="park__map">
               <h2 id="map-heading">{t('home.map')}</h2>
-              <ParkMap rides={data.rides} />
+              {guests && guests.inPark > 0 && (
+                <p className="hint">
+                  {t('home.guestsInPark', { n: guests.inPark })}
+                </p>
+              )}
+              <ParkMap rides={data.rides} guests={guests} />
             </section>
             <section aria-labelledby="list-heading" className="park__list">
               <h2 id="list-heading">{t('home.list')}</h2>

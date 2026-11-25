@@ -15,7 +15,7 @@ export const list = query({
       rides: rides
         .map((r) => {
           const s = stateByRide.get(r._id)
-          return { id: r._id, slug: r.slug, name: r.name, x: r.x, y: r.y, icon: r.icon ?? null, wait: s?.wait ?? 0, closed: s?.closed ?? false, updatedAt: s?.updatedAt ?? 0 }
+          return { id: r._id, slug: r.slug, name: r.name, x: r.x, y: r.y, icon: r.icon ?? null, wait: s?.wait ?? 0, closed: s?.closed ?? false, queue: s?.queue ?? 0, updatedAt: s?.updatedAt ?? 0 }
         })
         .sort((a, b) => a.name.localeCompare(b.name)),
     }

@@ -41,7 +41,16 @@ export class RideController {
     return { wait: RideController.pickTarget(ride, rng), targetWait: RideController.pickTarget(ride, rng), closed: false }
   }
 
-  static step(ride: RideConfig, state: RideSnapshot, rng: Rng): RideStep {
+  /** Extra minutes the wait aims for when guests are queuing: each person in line adds half a minute. */
+  static queueBonus(queue: number): number {
+    return Math.round(Math.max(0, queue) * 0.5)
+  }
+
+  /**
+   * One tick for one ride. `queue` is how many named guests are in line: it lifts the wait the ride aims for, so
+   * waits react to the crowd. It defaults to 0, which is the upstream behaviour.
+   */
+  static step(ride: RideConfig, state: RideSnapshot, rng: Rng, queue = 0): RideStep {
     if (state.closed) {
       if (rng() >= RideController.REOPEN_PROBABILITY) return { ...state, wait: 0, transition: 'none' }
       return {
@@ -56,11 +65,12 @@ export class RideController {
       return { wait: 0, targetWait: state.targetWait, closed: true, transition: 'closed' }
     }
 
-    const gap = state.targetWait - state.wait
+    const aim = Math.min(ride.maxWait, state.targetWait + RideController.queueBonus(queue))
+    const gap = aim - state.wait
     const move = Math.max(-ride.waitChangeRate, Math.min(ride.waitChangeRate, gap))
     const wait = Math.max(ride.minWait, Math.min(ride.maxWait, state.wait + move))
     // Reached the target (or close enough to be there next tick): choose a new one.
-    const targetWait = wait === state.targetWait ? RideController.pickTarget(ride, rng) : state.targetWait
+    const targetWait = wait === aim ? RideController.pickTarget(ride, rng) : state.targetWait
     return { wait, targetWait, closed: false, transition: wait === state.wait ? 'none' : 'wait-changed' }
   }
 }

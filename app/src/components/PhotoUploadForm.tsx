@@ -10,24 +10,24 @@ import { useI18n } from './I18nProvider'
 const PARK_SLUG = 'innovator-island'
 const MAX_MB = MAX_UPLOAD_BYTES / (1024 * 1024)
 
-type Problem = 'none' | 'UploadTooLarge' | 'NotAnImage' | 'RateLimited' | 'Unknown'
+type Problem = 'none' | 'UploadTooLarge' | 'NotAnImage' | 'RateLimited' | 'Unauthenticated' | 'Unknown'
 type Phase = 'idle' | 'uploading' | 'queued'
 
 function problemFrom(error: unknown): Problem {
   if (error instanceof ConvexError) {
     const data = error.data as { code?: string; kind?: string } | undefined
-    if (data?.code === 'UploadTooLarge' || data?.code === 'NotAnImage') return data.code
+    if (data?.code === 'UploadTooLarge' || data?.code === 'NotAnImage' || data?.code === 'Unauthenticated') return data.code
     if (data?.kind === 'RateLimited') return 'RateLimited'
   }
   return 'Unknown'
 }
 
 /**
- * Replaces the upstream `getUploadURL` Lambda plus a presigned S3 PUT. The browser checks type and size first (a
+ * Replaces the upstream `getUploadURL` Lambda plus a presigned S3 PUT, for signed-in users only. The browser checks type and size first (a
  * courtesy), then asks for an upload URL, POSTs the file straight to Convex storage and submits it, and the server
  * validates the stored file again.
  */
-export function PhotoUploadForm({ guestId }: { guestId: string }) {
+export function PhotoUploadForm() {
   const { t } = useI18n()
   const convex = useConvex()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -56,11 +56,11 @@ export function PhotoUploadForm({ guestId }: { guestId: string }) {
     setProblem(null)
     setPhase('uploading')
     try {
-      const url = await convex.mutation(api.photos.generateUploadUrl, { guestId })
+      const url = await convex.mutation(api.photos.generateUploadUrl, {})
       const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': file.type }, body: file })
       if (!response.ok) return fail('Unknown')
       const { storageId } = (await response.json()) as { storageId: (typeof api.photos.submit)['_args']['storageId'] }
-      const result = await convex.mutation(api.photos.submit, { guestId, parkSlug: PARK_SLUG, storageId })
+      const result = await convex.mutation(api.photos.submit, { parkSlug: PARK_SLUG, storageId })
       if (!result.ok) return fail(result.code)
       setPhase('queued')
       if (inputRef.current) inputRef.current.value = ''

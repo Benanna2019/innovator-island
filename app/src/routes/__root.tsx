@@ -2,7 +2,7 @@
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
 import type { ConvexQueryClient } from '@convex-dev/react-query'
-import { ConvexProvider } from 'convex/react'
+import { ConvexAuthProvider } from '@convex-dev/auth/react'
 import type { ReactNode } from 'react'
 import { I18nProvider, useI18n } from '#/components/I18nProvider'
 import { I18n } from '#/i18n'
@@ -14,7 +14,7 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   convexQueryClient: ConvexQueryClient
 }>()({
-  // Guest id and language come from cookies. They only change through setLocale, which invalidates the router.
+  // The language comes from a cookie. They only change through setLocale, which invalidates the router.
   loader: () => getSession(),
   staleTime: Infinity,
   head: ({ loaderData }) => {
@@ -39,9 +39,9 @@ function RootComponent() {
   return (
     <I18nProvider locale={locale}>
       <RootDocument locale={locale}>
-        <ConvexProvider client={convexQueryClient.convexClient}>
+        <ConvexAuthProvider client={convexQueryClient.convexClient}>
           <Outlet />
-        </ConvexProvider>
+        </ConvexAuthProvider>
       </RootDocument>
     </I18nProvider>
   )

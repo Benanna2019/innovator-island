@@ -27,3 +27,17 @@
 - **`finishAllScheduledFunctions` runs the real workflow in tests.** A test that submits a photo and then flushes timers sees the pipeline fail on dummy bytes and delete the original, so the sweeper test must not flush.
 - **Scheduled function names in `_scheduled_functions` are `events:dispatch`**, without `.js`.
 - **No `httpAction` was needed.** Size and type are still only checked after upload (the file is already in storage by then), so the daily sweeper plus magic-byte and pixel checks in the pipeline are the backstop.
+
+## Logins and demo data
+
+- **Customising the `users` table.** `authTables` already defines `users`, so a `role` field means redefining it after the spread and keeping the `email` index by hand. The auth library's `profile()` runs on every sign-in, so putting `role` there would reset an admin to guest on each login. A missing role means guest instead, and `demo:ensureAccounts` sets roles in a separate mutation.
+- **`Password`'s `profile` runs for every flow**, including sign-in, so closing sign-up in demo mode is a check on `params.flow === "signUp"` inside it.
+- **`ConvexCredentials` has no test helper.** `convex-test` cannot run `signIn` end to end, so the demo check is a plain function that takes an injected account lookup. The allow-list and demo-mode tests call it directly, and the live path was checked once against the dev deployment with `ConvexHttpClient`.
+- **Identity in tests.** `t.withIdentity({ subject: "<userId>|<session>" })` is enough for `getAuthUserId`, as the auth library reads the user id from the first part of the subject. The handle it returns is narrower than the full tester type (no `run` helpers in the type), so test helpers type it with a `Pick`.
+- **A schema push validates existing rows.** Replacing `photos.guestId` with a required `userId` failed on the dev deployment's old test rows. Clearing the table needs `convex import --replace`, which is a destructive command, so the schema keeps `guestId` and `userId` optional instead. A fresh deployment never has legacy rows.
+- **`convex codegen` pushes to the dev deployment.** It printed "Uploading functions" while only meant to generate types, so a bad schema fails there too.
+- **Backdating events goes through the aggregate.** `EventBus.publish` takes an `at` option so seeded history lands in `parkStats` in the right place, and the retention prune and the reset both remove the aggregate rows with the events. A test checks the aggregate counts equal the table counts after seeding and after reset.
+- **Seeding in batches.** Aggregate inserts touch several documents each, so history goes in three hours per mutation and guests forty per mutation, driven by an action. The seed is idempotent by a stable slug per guest, an hour key per history visitor, and `parks.demoSeededAt` for the whole history.
+- **Node action files cannot hold mutations.** The ticket-stub photo seeder needs `jimp` and so lives in a `"use node"` file (`demoPhotos.ts`), and its queries and mutations live in `demoData.ts`.
+- **`convex env set` takes the value as an argument**, so a value starting with a dash needs `--` before it, and the value shows in the process list while the command runs. The setup script passes values as arguments with output ignored and catches errors without printing them, because the error message contains the command line.
+- **`pnpm` was not on the PATH** in this shell, and `pnpm@10` refused a `node_modules` made by pnpm 11. `npx pnpm@11 <command>` worked.

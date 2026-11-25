@@ -62,8 +62,8 @@ Why: the cron is built in, and a pure step function is easy to test and to swap 
 ### 3. Realtime
 
 AWS: SNS, a Lambda, IoT Core MQTT over websockets, and a Cognito identity pool so browsers can connect.
-Ours: `useQuery` on `rides.list`, `outages.active` and `photos.forGuest`.
-Why: Convex queries push updates, so there are no topics, credentials or client libraries to manage. Guests are anonymous, identified by a random id in an httpOnly cookie. The id is a bearer secret: whoever holds it can see that guest's gallery.
+Ours: `useQuery` on `rides.list`, `outages.active` and `photos.mine`.
+Why: Convex queries push updates, so there are no topics, credentials or client libraries to manage. Browsers are anonymous until they sign in, and only uploading photos needs an account. Convex Auth (password, plus a demo-only guest sign-in) replaces the Cognito identity pool, and `photos.mine` returns only the signed-in user's gallery.
 
 ### 4. Event bus and outages
 
@@ -76,7 +76,7 @@ Why: the log is durable and transactional, and a repeat delivery is harmless bec
 AWS: the browser PUTs a selfie to S3 through a presigned URL from the `getUploadURL` Lambda. An S3 trigger runs an OpenCV Lambda (chroma key), whose output triggers a Jimp Lambda (composite with a background and frame), whose output triggers a post-process Lambda that writes DynamoDB and notifies the browser over IoT.
 Ours:
 
-- `photos.generateUploadUrl` returns a Convex storage upload URL, rate limited per guest and globally with `@convex-dev/rate-limiter`.
+- `photos.generateUploadUrl` returns a Convex storage upload URL, login required, rate limited per user and globally with `@convex-dev/rate-limiter`.
 - `photos.submit` validates what was really stored (type and size), then starts the `processPhoto` workflow from `@convex-dev/workflow`.
 - The workflow runs three Node actions, `chromaKey`, `composite` and `finalize` (`convex/photoSteps.ts`), each wrapping a pure-JS step in `src/domain/image/pipeline.ts` written with Effect. Failures are tagged errors: `UploadTooLarge`, `NotAnImage` and `ChromaKeyFailed`.
 - The chroma key is plain TypeScript over RGBA pixels with the upstream default HSV range (36,50,50) to (70,255,255), on OpenCV's scale. It fails with `ChromaKeyFailed` when under 2 percent of the photo is green.

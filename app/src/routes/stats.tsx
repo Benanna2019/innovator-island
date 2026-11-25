@@ -3,6 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { api } from '../../convex/_generated/api'
 import { useI18n } from '#/components/I18nProvider'
+import { LOCALES } from '#/i18n'
 import { SiteFooter } from '#/components/SiteFooter'
 import { SiteHeader } from '#/components/SiteHeader'
 
@@ -47,6 +48,36 @@ function Stats() {
               <h2 id="hours-heading">{t('stats.perHour')}</h2>
               <HourBars rows={data.ridesPerHour} format={(hoursAgo) => relative.format(-hoursAgo, 'hour')} numbers={numbers} />
             </section>
+            <section aria-labelledby="over-time-heading">
+              <h2 id="over-time-heading">{t('stats.overTime')}</h2>
+              <HourBars
+                rows={data.headcountOverTime.map((p) => ({ from: p.at, rides: p.headcount }))}
+                format={(hoursAgo) => relative.format(-hoursAgo + 1, 'hour')}
+                numbers={numbers}
+                label="stats.overTimeLabel"
+              />
+            </section>
+            <section aria-labelledby="languages-heading">
+              <h2 id="languages-heading">{t('stats.languages')}</h2>
+              <p className="hint">{t('stats.guests')}: {numbers.format(data.guestsInPark)}</p>
+              <ol className="bars">
+                {LOCALES.map((l) => {
+                  const count = data.languages[l.code]
+                  const max = Math.max(1, ...Object.values(data.languages))
+                  return (
+                    <li key={l.code} className="bars__row">
+                      <span className="bars__label" lang={l.code}>
+                        {l.label}
+                      </span>
+                      <span className="bars__track" aria-hidden="true">
+                        <span className="bars__fill" style={{ width: `${(count / max) * 100}%` }} />
+                      </span>
+                      <span className="bars__value">{numbers.format(count)}</span>
+                    </li>
+                  )
+                })}
+              </ol>
+            </section>
           </>
         )}
       </main>
@@ -68,10 +99,12 @@ function HourBars({
   rows,
   format,
   numbers,
+  label = 'stats.hourLabel',
 }: {
   rows: readonly { from: number; rides: number }[]
   format: (hoursAgo: number) => string
   numbers: Intl.NumberFormat
+  label?: 'stats.hourLabel' | 'stats.overTimeLabel'
 }) {
   const { t } = useI18n()
   const max = Math.max(1, ...rows.map((r) => r.rides))
@@ -79,7 +112,7 @@ function HourBars({
     <ol className="bars">
       {rows.map((row, i) => (
         <li key={row.from} className="bars__row">
-          <span className="bars__label">{t('stats.hourLabel', { time: format(rows.length - i) })}</span>
+          <span className="bars__label">{t(label, { time: format(rows.length - i) })}</span>
           <span className="bars__track" aria-hidden="true">
             <span className="bars__fill" style={{ width: `${(row.rides / max) * 100}%` }} />
           </span>

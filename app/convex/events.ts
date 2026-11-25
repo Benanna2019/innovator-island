@@ -34,6 +34,12 @@ export const prune = internalMutation({
         .take(PRUNE_BATCH)
       for (const event of old) {
         if (isStatsEvent(event.payload.type)) await parkStats.deleteIfExists(ctx, event)
+        // The visitor row goes with its arrival event, so `visitors` stays in step with the aggregate. A visitor
+        // still in the park (no exit yet) is kept: the simulators and named guests still point at it.
+        if (event.payload.type === "VisitorEntered") {
+          const visitor = await ctx.db.get(event.payload.visitorId)
+          if (visitor && visitor.exitedAt !== undefined) await ctx.db.delete(visitor._id)
+        }
         await ctx.db.delete(event._id)
       }
       deleted += old.length

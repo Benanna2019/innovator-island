@@ -1,24 +1,29 @@
 import { start, vResultValidator, vWorkflowId } from "@convex-dev/workflow"
 import { ConvexError, v } from "convex/values"
 import { internal } from "./_generated/api"
+import type { Id } from "./_generated/dataModel"
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server"
-import { rateLimiter } from "./lib/limits"
-import { GuestId } from "../src/domain/guest-id.ts"
+import type { QueryCtx } from "./_generated/server"
+import { requireUser } from "./lib/auth"
+import { MAX_PENDING_PHOTOS, rateLimiter } from "./lib/limits"
 import { PhotoValidation } from "../src/domain/photo-validation.ts"
+import { getAuthUserId } from "@convex-dev/auth/server"
 
-const guestId = v.string()
-
-function assertGuestId(id: string) {
-  if (!GuestId.isValid(id)) throw new ConvexError({ code: "BadGuestId" })
+/** Photos of this user that have not finished yet. Looks at the newest few only: older ones are long done or failed. */
+async function pendingCount(ctx: QueryCtx, userId: Id<"users">): Promise<number> {
+  const recent = await ctx.db.query("photos").withIndex("by_user", (q) => q.eq("userId", userId)).order("desc").take(MAX_PENDING_PHOTOS * 2)
+  return recent.filter((p) => p.status === "uploaded" || p.status === "processing").length
 }
 
-/** Upstream `getUploadURL`: a presigned S3 PUT. Here it is file storage, throttled per guest and across all guests. */
+/** Upstream `getUploadURL`: a presigned S3 PUT. Here it is file storage, for signed-in users only, throttled per user and across all users. */
 export const generateUploadUrl = mutation({
-  args: { guestId },
-  handler: async (ctx, args) => {
-    assertGuestId(args.guestId)
-    await rateLimiter.limit(ctx, "photoUpload", { key: args.guestId, throws: true })
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireUser(ctx)
+    if ((await pendingCount(ctx, user._id)) >= MAX_PENDING_PHOTOS) throw new ConvexError({ kind: "RateLimited", retryAfter: 30_000 })
+    await rateLimiter.limit(ctx, "photoUpload", { key: user._id, throws: true })
     await rateLimiter.limit(ctx, "photoUploadGlobal", { throws: true })
+    await rateLimiter.limit(ctx, "photoUploadDaily", { throws: true })
     return await ctx.storage.generateUploadUrl()
   },
 })
@@ -28,15 +33,22 @@ export const generateUploadUrl = mutation({
  * A rejected file comes back as a result, not a throw: a throw would roll back the delete and orphan the blob.
  */
 export const submit = mutation({
-  args: { guestId, parkSlug: v.string(), storageId: v.id("_storage") },
+  args: { parkSlug: v.string(), storageId: v.id("_storage") },
   handler: async (ctx, args) => {
-    assertGuestId(args.guestId)
+    const user = await requireUser(ctx)
     // A double click or a retry gets the photo that is already running, not a second row and workflow.
     const existing = await ctx.db.query("photos").withIndex("by_original", (q) => q.eq("originalId", args.storageId)).first()
     if (existing) {
-      if (existing.guestId !== args.guestId) return { ok: false as const, code: "NotAnImage" as const }
+      if (existing.userId !== user._id) return { ok: false as const, code: "NotAnImage" as const }
       return { ok: true as const, photoId: existing._id }
     }
+    // The id must be a fresh upload. A blob that already belongs to a photo (any stage) would be deleted with that photo's workflow.
+    const claimed = await Promise.all([
+      ctx.db.query("photos").withIndex("by_keyed", (q) => q.eq("keyedId", args.storageId)).first(),
+      ctx.db.query("photos").withIndex("by_composed", (q) => q.eq("composedId", args.storageId)).first(),
+      ctx.db.query("photos").withIndex("by_final", (q) => q.eq("finalId", args.storageId)).first(),
+    ])
+    if (claimed.some(Boolean)) return { ok: false as const, code: "NotAnImage" as const }
     const file = await ctx.db.system.get(args.storageId)
     if (!file) return { ok: false as const, code: "NotAnImage" as const }
     const problem = PhotoValidation.firstError({ size: file.size, type: file.contentType ?? "" })
@@ -44,11 +56,15 @@ export const submit = mutation({
       await ctx.storage.delete(args.storageId)
       return { ok: false as const, code: problem._tag }
     }
+    if ((await pendingCount(ctx, user._id)) >= MAX_PENDING_PHOTOS) {
+      await ctx.storage.delete(args.storageId)
+      return { ok: false as const, code: "RateLimited" as const }
+    }
     const park = await ctx.db.query("parks").withIndex("by_slug", (q) => q.eq("slug", args.parkSlug)).unique()
     if (!park) throw new ConvexError({ code: "NoPark" })
     const photoId = await ctx.db.insert("photos", {
       parkId: park._id,
-      guestId: args.guestId,
+      userId: user._id,
       status: "uploaded",
       originalId: args.storageId,
       createdAt: Date.now(),
@@ -61,12 +77,13 @@ export const submit = mutation({
   },
 })
 
-/** The live gallery. Upstream pushed "photo ready" to the browser over IoT MQTT. */
-export const forGuest = query({
-  args: { guestId },
-  handler: async (ctx, args) => {
-    if (!GuestId.isValid(args.guestId)) return []
-    const photos = await ctx.db.query("photos").withIndex("by_guest", (q) => q.eq("guestId", args.guestId)).order("desc").take(12)
+/** The live gallery of the signed-in user. Upstream pushed "photo ready" to the browser over IoT MQTT. */
+export const mine = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx)
+    if (!userId) return []
+    const photos = await ctx.db.query("photos").withIndex("by_user", (q) => q.eq("userId", userId)).order("desc").take(12)
     return await Promise.all(
       photos.map(async (p) => ({
         id: p._id,

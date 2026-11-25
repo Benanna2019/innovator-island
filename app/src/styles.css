@@ -266,12 +266,45 @@ button[type='submit']:disabled { opacity: 0.6; cursor: progress; }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
+/* Accounts, guests and the operator console. */
+.avatar { display: inline-block; flex: none; vertical-align: middle; }
+.auth-status { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; color: #fff; font-size: 0.95rem; }
+.auth-status__who { font-weight: 600; overflow-wrap: anywhere; }
+.auth-status__button, .auth-status__link { min-height: 2.75rem; display: inline-flex; align-items: center; padding: 0 1rem; border-radius: 999px; border: 2px solid #fff; background: transparent; color: #fff; font: inherit; font-family: var(--display); font-weight: 500; text-decoration: none; cursor: pointer; }
+.site-header :where(.auth-status__button, .auth-status__link):focus-visible { outline-color: #fff; box-shadow: 0 0 0 5px var(--ink); }
+.button--link, .form .button--link { background: transparent; color: var(--sea-deep); border-color: transparent; box-shadow: none; text-decoration: underline; padding: 0 0.25rem; min-height: 2.75rem; font-size: 1rem; }
+.button--secondary { background: #fff; color: var(--ink); border: 3px solid var(--sea); border-radius: 999px; min-height: 2.75rem; padding: 0 1.4rem; font-family: var(--display); font-weight: 600; cursor: pointer; }
+main button:not([type='submit']):not(.button--link):not(.button--secondary) { display: inline-flex; align-items: center; justify-self: start; min-height: 2.75rem; padding: 0 1.4rem; border: 3px solid #fff; border-radius: 999px; background: var(--path-deep); color: #fff; font-family: var(--display); font-weight: 600; font-size: 1.05rem; cursor: pointer; box-shadow: 0 4px 0 #7c3a06; }
+main button:disabled { opacity: 0.6; cursor: progress; }
+.field input[type='email'], .field input[type='password'], .field input[type='text'], .field input[type='number'] { min-height: 2.75rem; padding: 0 0.75rem; border: 3px solid var(--sea); border-radius: 12px; background: #fff; color: var(--ink); font: inherit; width: 100%; }
+.demo-box { background: var(--sand-deep); }
+.demo-box h2 { margin-bottom: 0; }
+.demo-box__buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.admin-rides { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); }
+.admin-row { display: grid; gap: 0.75rem; align-content: start; padding: 1rem; background: #fff; border: 3px solid var(--sea); border-radius: var(--radius); }
+.admin-row__name { margin: 0; font-family: var(--display); font-size: 1.15rem; color: var(--sea-deep); }
+.admin-row__status { margin: 0; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.admin-row__form { display: grid; gap: 0.75rem; }
+.admin-row__actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.map__walkers { list-style: none; margin: 0; padding: 0; }
+.walker { position: absolute; z-index: 1; transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.25)); }
+.marker__queue { display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.15rem; padding: 0 0.45rem 0 0.2rem; border-radius: 999px; background: #fff; border: 2px solid var(--sea); color: var(--ink); font-size: 0.7rem; font-weight: 600; line-height: 1.5; white-space: nowrap; }
+.marker__faces { display: inline-flex; }
+.marker__faces .avatar + .avatar { margin-left: -0.45rem; }
+@container (max-width: 30rem) { .marker__queue { display: none; } .walker svg { width: 16px; height: 16px; } }
+.ride__queue { font-size: 0.8rem; color: var(--ink-soft); white-space: nowrap; }
+.ride-people { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); width: 100%; max-width: 40rem; justify-self: center; }
+.ride-people h3 { margin: 1rem 0 0.5rem; font-family: var(--display); font-size: 1.1rem; color: var(--sea-deep); }
+.people { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.person { display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.6rem; background: #fff; border: 2px solid var(--line); border-radius: 999px; }
+
 /* Motion only when the visitor has not asked for less. */
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
   .bars__fill { transition: width 0.4s ease; }
   .marker__bubble { animation: bob 3.6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.45s); }
   .marker .pill { animation: pop 0.45s ease-out; }
+  .walker { transition: left 1.2s ease, top 1.2s ease; }
   .pill { animation: pop 0.45s ease-out; }
   .nav a, .button, button[type='submit'] { transition: transform 0.15s ease; }
   .nav a:hover, .button:hover, button[type='submit']:hover:not(:disabled) { transform: translateY(-2px); }

@@ -1,9 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { WaitLabel } from '#/domain/wait-label'
 import type { MapRide } from './ParkMap'
+import { useI18n } from './I18nProvider'
 import { WaitPill, rideIconSrc } from './WaitPill'
 
 export function RideList({ rides }: { rides: readonly MapRide[] }) {
+  const { t } = useI18n()
   return (
     <ul className="rides">
       {rides.map((r) => {
@@ -15,6 +17,7 @@ export function RideList({ rides }: { rides: readonly MapRide[] }) {
             <Link to="/rides/$slug" params={{ slug: r.slug }} className="ride__name">
               {r.name}
             </Link>
+            {r.queue > 0 && <span className="ride__queue">{t('queue.chip', { n: r.queue })}</span>}
             <WaitPill wait={r.wait} closed={r.closed} level={level} />
           </li>
         )
